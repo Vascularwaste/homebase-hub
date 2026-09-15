@@ -294,76 +294,129 @@
   }
 
   /* ------------------------------------------------------------ */
-  /* Book List section                                             */
+  /* Book List section — rendered as a clean data table (initials  */
+  /* avatar, title + overview subline, colored genre/status pills, */
+  /* a link chip for source, plain date) rather than stacked cards.*/
   /* ------------------------------------------------------------ */
   .book-list{
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
     width: 100%;
-    max-height: 220px;
-    overflow-y: auto;
-    padding-right: 8px;
+    max-height: 260px;
+    overflow: auto;
+    border: 1.5px solid rgba(17,17,17,0.14);
+    border-radius: 10px;
+    background: #fff;
   }
-  .book-item{
-    border-bottom: 1.5px solid rgba(17,17,17,0.15);
-    padding-bottom: 14px;
+  .book-table{ min-width: 640px; width: 100%; }
+  .book-table-head, .book-tr{
+    display: grid;
+    grid-template-columns: 2.1fr 1fr 0.95fr 0.95fr 1.15fr 0.9fr;
+    align-items: center;
   }
-  .book-item:last-child{ border-bottom: none; padding-bottom: 0; }
-  .book-top{
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 8px;
+  .book-table-head{
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #fafaf6;
+    border-bottom: 1.5px solid rgba(17,17,17,0.14);
   }
-  .book-title{
-    font-weight: 900;
-    font-size: 16px;
-    letter-spacing: -0.01em;
+  .book-th{
+    padding: 10px 14px;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
+    color: rgba(17,17,17,0.45);
+    white-space: nowrap;
   }
-  .book-author{
+  .book-tr{
+    border-bottom: 1px solid rgba(17,17,17,0.08);
+    transition: background 0.12s ease;
+  }
+  .book-tr:last-child{ border-bottom: none; }
+  .book-tr:hover{ background: rgba(17,17,17,0.035); }
+  .book-td{
+    padding: 12px 14px;
     font-size: 13px;
     font-weight: 600;
-    opacity: 0.65;
-    font-style: italic;
+    color: var(--ink);
+    overflow: hidden;
   }
-  .book-meta{
+  .td-title{
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-    margin-top: 6px;
+    align-items: flex-start;
+    gap: 10px;
+    min-width: 0;
   }
-  .book-badge{
-    border: 1.5px solid var(--ink);
+  .book-avatar{
+    flex: none;
+    width: 26px;
+    height: 26px;
     border-radius: 999px;
-    padding: 2px 11px;
-    font-size: 10px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    background: rgba(255,255,255,0.4);
-  }
-  .book-date{
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 11px;
-    font-weight: 700;
-    opacity: 0.55;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
+    font-weight: 800;
+    margin-top: 1px;
   }
-  .book-overview{
+  .book-title-wrap{ min-width: 0; }
+  .book-title{
+    font-weight: 800;
     font-size: 13.5px;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .book-overview-sub{
+    font-size: 11.5px;
     font-weight: 500;
-    line-height: 1.45;
-    margin: 8px 0 0;
+    color: rgba(17,17,17,0.55);
+    margin-top: 2px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.35;
   }
-  .book-source{
+  .td-author{
+    font-weight: 600;
+    opacity: 0.75;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .book-pill{
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  .book-source-chip{
+    display: inline-block;
+    max-width: 100%;
+    padding: 3px 9px;
+    border-radius: 6px;
+    background: rgba(17,17,17,0.06);
+    color: var(--ink);
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  a.book-source-chip:hover{ background: rgba(17,17,17,0.12); }
+  .td-date{
     font-size: 12px;
-    font-style: italic;
-    opacity: 0.6;
-    margin: 4px 0 0;
+    font-weight: 600;
+    opacity: 0.65;
+    white-space: nowrap;
   }
+
   .books-expand-btn{
     align-self: flex-start;
     margin-top: 16px;
@@ -422,14 +475,16 @@
   }
   .books-overlay-list{
     flex: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    padding-right: 10px;
+    overflow: auto;
+    border: 1.5px solid rgba(17,17,17,0.14);
+    border-radius: 10px;
+    background: #fff;
   }
-  .books-overlay-list .book-title{ font-size: 19px; }
-  .books-overlay-list .book-overview{ font-size: 14.5px; }
+  .books-overlay-list .book-th,
+  .books-overlay-list .book-td{ padding: 14px 18px; }
+  .books-overlay-list .book-title{ font-size: 15px; white-space: normal; }
+  .books-overlay-list .book-overview-sub{ font-size: 12.5px; -webkit-line-clamp: 3; }
+
 </style>
 </head>
 <body>
@@ -703,22 +758,81 @@
     return items.slice().sort((a, b) => parseDateSafe(b.dateAdded) - parseDateSafe(a.dateAdded));
   }
 
-  function bookItemHtml(b){
-    const badges = [];
-    if(b.genre) badges.push(`<span class="book-badge">${escapeHtml(b.genre)}</span>`);
-    if(b.status) badges.push(`<span class="book-badge">${escapeHtml(b.status)}</span>`);
+  // Consistent (not random) color per genre/status/title string, drawn
+  // from a fixed pastel palette — same tag always gets the same color,
+  // like Notion-style select tags, without needing to hand-pick colors
+  // per value.
+  const TAG_PALETTE = [
+    { bg: "#DBEAFE", fg: "#1D4ED8" },
+    { bg: "#DCFCE7", fg: "#15803D" },
+    { bg: "#FEF3C7", fg: "#92400E" },
+    { bg: "#FCE7F3", fg: "#9D174D" },
+    { bg: "#EDE9FE", fg: "#5B21B6" },
+    { bg: "#FEE2E2", fg: "#B91C1C" },
+    { bg: "#CCFBF1", fg: "#0F766E" },
+    { bg: "#FFE4E6", fg: "#9F1239" }
+  ];
+  function hashStr(s){
+    let h = 0;
+    const str = String(s || "");
+    for(let i = 0; i < str.length; i++){ h = (h * 31 + str.charCodeAt(i)) >>> 0; }
+    return h;
+  }
+  function tagColor(s){
+    return TAG_PALETTE[hashStr(s) % TAG_PALETTE.length];
+  }
+  function pillHtml(text){
+    if(!text) return "";
+    const c = tagColor(text);
+    return `<span class="book-pill" style="background:${c.bg};color:${c.fg}">${escapeHtml(text)}</span>`;
+  }
+  function avatarHtml(title){
+    const letter = (title || "?").trim().charAt(0).toUpperCase() || "?";
+    const c = tagColor(title || "");
+    return `<span class="book-avatar" style="background:${c.bg};color:${c.fg}">${escapeHtml(letter)}</span>`;
+  }
+  function sourceChipHtml(source){
+    if(!source) return "";
+    const trimmed = source.trim();
+    const display = trimmed.length > 26 ? trimmed.slice(0, 24) + "…" : trimmed;
+    const label = escapeHtml(display);
+    if(/^https?:\/\//i.test(trimmed)){
+      return `<a class="book-source-chip" href="${escapeHtml(trimmed)}" target="_blank" rel="noopener noreferrer">${label}</a>`;
+    }
+    return `<span class="book-source-chip">${label}</span>`;
+  }
+
+  function bookRowHtml(b){
     return `
-      <div class="book-item">
-        <div class="book-top">
-          <span class="book-title">${escapeHtml(b.title)}</span>
-          <span class="book-author">${b.author ? "by " + escapeHtml(b.author) : ""}</span>
+      <div class="book-tr">
+        <div class="book-td td-title">
+          ${avatarHtml(b.title)}
+          <div class="book-title-wrap">
+            <div class="book-title">${escapeHtml(b.title)}</div>
+            ${b.overview ? `<div class="book-overview-sub">${escapeHtml(b.overview)}</div>` : ""}
+          </div>
         </div>
-        <div class="book-meta">
-          ${badges.join("")}
-          ${b.dateAdded ? `<span class="book-date">Added ${escapeHtml(formatBookDate(b.dateAdded))}</span>` : ""}
+        <div class="book-td td-author">${b.author ? escapeHtml(b.author) : ""}</div>
+        <div class="book-td td-genre">${pillHtml(b.genre)}</div>
+        <div class="book-td td-status">${pillHtml(b.status)}</div>
+        <div class="book-td td-source">${sourceChipHtml(b.source)}</div>
+        <div class="book-td td-date">${b.dateAdded ? escapeHtml(formatBookDate(b.dateAdded)) : ""}</div>
+      </div>
+    `;
+  }
+
+  function bookTableHtml(sorted){
+    return `
+      <div class="book-table">
+        <div class="book-table-head">
+          <div class="book-th th-title">Title</div>
+          <div class="book-th th-author">Author</div>
+          <div class="book-th th-genre">Genre</div>
+          <div class="book-th th-status">Status</div>
+          <div class="book-th th-source">Source</div>
+          <div class="book-th th-date">Added</div>
         </div>
-        ${b.overview ? `<p class="book-overview">${escapeHtml(b.overview)}</p>` : ""}
-        ${b.source ? `<p class="book-source">Source: ${escapeHtml(b.source)}</p>` : ""}
+        <div class="book-table-body">${sorted.map(bookRowHtml).join("")}</div>
       </div>
     `;
   }
@@ -729,14 +843,15 @@
       return;
     }
     const sorted = sortBooksDesc(mapped);
-    const listHtml = sorted.map(bookItemHtml).join("");
+    const tableHtml = bookTableHtml(sorted);
     el.innerHTML = `
       <span class="tag">${escapeHtml(section.title)}</span>
-      <div class="book-list">${listHtml}</div>
+      <div class="book-list">${tableHtml}</div>
       <button class="books-expand-btn" type="button">Expand list</button>
     `;
-    el.querySelector(".books-expand-btn").addEventListener("click", () => openBooksOverlay(listHtml));
+    el.querySelector(".books-expand-btn").addEventListener("click", () => openBooksOverlay(tableHtml));
   }
+
 
   function openBooksOverlay(listHtml){
     document.getElementById("booksOverlayList").innerHTML = listHtml;
