@@ -328,6 +328,12 @@
     color: rgba(17,17,17,0.45);
     white-space: nowrap;
   }
+  .book-th[data-sort-key]{
+    cursor: pointer;
+    user-select: none;
+  }
+  .book-th[data-sort-key]:hover{ color: rgba(17,17,17,0.8); }
+
   .book-tr{
     border-bottom: 1px solid rgba(17,17,17,0.08);
     transition: background 0.12s ease;
@@ -821,16 +827,39 @@
     `;
   }
 
-  function bookTableHtml(sorted){
+  // Generic sort: "dateAdded" compares as dates (newest first by default),
+  // every other key compares as case-insensitive text. dir is "asc"/"desc".
+  function sortBooksBy(items, key, dir){
+    const mul = dir === "asc" ? 1 : -1;
+    return items.slice().sort((a, b) => {
+      if(key === "dateAdded"){
+        return mul * (parseDateSafe(a.dateAdded) - parseDateSafe(b.dateAdded));
+      }
+      const av = (a[key] || "").toString().toLowerCase();
+      const bv = (b[key] || "").toString().toLowerCase();
+      if(av < bv) return -1 * mul;
+      if(av > bv) return 1 * mul;
+      return 0;
+    });
+  }
+
+  function sortArrow(activeKey, key, dir){
+    if(activeKey !== key) return "";
+    return dir === "asc" ? " ▲" : " ▼";
+  }
+
+  function bookTableHtml(sorted, sortKey, sortDir){
+    sortKey = sortKey || "dateAdded";
+    sortDir = sortDir || "desc";
     return `
       <div class="book-table">
         <div class="book-table-head">
-          <div class="book-th th-title">Title</div>
-          <div class="book-th th-author">Author</div>
-          <div class="book-th th-genre">Genre</div>
-          <div class="book-th th-status">Status</div>
+          <div class="book-th th-title" data-sort-key="title">Title${sortArrow(sortKey, "title", sortDir)}</div>
+          <div class="book-th th-author" data-sort-key="author">Author${sortArrow(sortKey, "author", sortDir)}</div>
+          <div class="book-th th-genre" data-sort-key="genre">Genre${sortArrow(sortKey, "genre", sortDir)}</div>
+          <div class="book-th th-status" data-sort-key="status">Status${sortArrow(sortKey, "status", sortDir)}</div>
           <div class="book-th th-source">Source</div>
-          <div class="book-th th-date">Added</div>
+          <div class="book-th th-date" data-sort-key="dateAdded">Added${sortArrow(sortKey, "dateAdded", sortDir)}</div>
         </div>
         <div class="book-table-body">${sorted.map(bookRowHtml).join("")}</div>
       </div>
@@ -842,15 +871,34 @@
       el.innerHTML = blockBodyHtml(section, null, errorMsg);
       return;
     }
-    const sorted = sortBooksDesc(mapped);
-    const tableHtml = bookTableHtml(sorted);
-    el.innerHTML = `
-      <span class="tag">${escapeHtml(section.title)}</span>
-      <div class="book-list">${tableHtml}</div>
-      <button class="books-expand-btn" type="button">Expand list</button>
-    `;
-    el.querySelector(".books-expand-btn").addEventListener("click", () => openBooksOverlay(tableHtml));
+    let sortKey = "dateAdded";
+    let sortDir = "desc";
+
+    function draw(){
+      const sorted = sortBooksBy(mapped, sortKey, sortDir);
+      const tableHtml = bookTableHtml(sorted, sortKey, sortDir);
+      el.innerHTML = `
+        <span class="tag">${escapeHtml(section.title)}</span>
+        <div class="book-list">${tableHtml}</div>
+        <button class="books-expand-btn" type="button">Expand list</button>
+      `;
+      el.querySelectorAll(".book-th[data-sort-key]").forEach(th => {
+        th.addEventListener("click", () => {
+          const key = th.getAttribute("data-sort-key");
+          if(sortKey === key){
+            sortDir = sortDir === "asc" ? "desc" : "asc";
+          } else {
+            sortKey = key;
+            sortDir = "asc";
+          }
+          draw();
+        });
+      });
+      el.querySelector(".books-expand-btn").addEventListener("click", () => openBooksOverlay(bookTableHtml(sorted, sortKey, sortDir)));
+    }
+    draw();
   }
+
 
 
   function openBooksOverlay(listHtml){
