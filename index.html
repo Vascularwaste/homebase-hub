@@ -85,7 +85,8 @@
     grid-template-areas:
       "enforcement enforcement"
       "quotes dictionary"
-      "phrases law";
+      "phrases law"
+      "books books";
     gap: var(--seam);
     border: 3px solid var(--ink);
   }
@@ -97,7 +98,8 @@
         "quotes"
         "dictionary"
         "phrases"
-        "law";
+        "law"
+        "books";
     }
   }
 
@@ -116,6 +118,7 @@
   .block[data-key="phrases"]{ grid-area: phrases; }
   .block[data-key="dailylaw"]{ grid-area: law; }
   .block[data-key="dailyenforcement"]{ grid-area: enforcement; min-height: 280px; }
+  .block[data-key="books"]{ grid-area: books; min-height: 340px; }
 
   .block .tag{
     display: inline-block;
@@ -289,6 +292,144 @@
     font-weight: 700;
     text-align: center;
   }
+
+  /* ------------------------------------------------------------ */
+  /* Book List section                                             */
+  /* ------------------------------------------------------------ */
+  .book-list{
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    max-height: 220px;
+    overflow-y: auto;
+    padding-right: 8px;
+  }
+  .book-item{
+    border-bottom: 1.5px solid rgba(17,17,17,0.15);
+    padding-bottom: 14px;
+  }
+  .book-item:last-child{ border-bottom: none; padding-bottom: 0; }
+  .book-top{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .book-title{
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+  }
+  .book-author{
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0.65;
+    font-style: italic;
+  }
+  .book-meta{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .book-badge{
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+    padding: 2px 11px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: rgba(255,255,255,0.4);
+  }
+  .book-date{
+    font-size: 11px;
+    font-weight: 700;
+    opacity: 0.55;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .book-overview{
+    font-size: 13.5px;
+    font-weight: 500;
+    line-height: 1.45;
+    margin: 8px 0 0;
+  }
+  .book-source{
+    font-size: 12px;
+    font-style: italic;
+    opacity: 0.6;
+    margin: 4px 0 0;
+  }
+  .books-expand-btn{
+    align-self: flex-start;
+    margin-top: 16px;
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 9px 20px;
+    border-radius: 999px;
+    border: 2px solid var(--ink);
+    background: rgba(255,255,255,0.6);
+    color: var(--ink);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .books-expand-btn:hover{ background: var(--ink); color: #fff; }
+
+  .books-overlay{
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(17,17,17,0.45);
+  }
+  .books-overlay[hidden]{ display: none; }
+  .books-overlay-card{
+    position: relative;
+    background: #fff;
+    border: 3px solid var(--ink);
+    width: 100%;
+    max-width: 760px;
+    height: 80vh;
+    max-height: 720px;
+    padding: 44px 36px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .books-overlay-close{
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    border: 2.5px solid var(--ink);
+    background: #fff;
+    font-size: 18px;
+    font-weight: 800;
+    cursor: pointer;
+    color: var(--ink);
+  }
+  .books-overlay-list{
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-right: 10px;
+  }
+  .books-overlay-list .book-title{ font-size: 19px; }
+  .books-overlay-list .book-overview{ font-size: 14.5px; }
 </style>
 </head>
 <body>
@@ -315,10 +456,25 @@
     <div class="study-card" id="studyCard"></div>
   </div>
 
+  <div class="books-overlay" id="booksOverlay" hidden>
+    <div class="books-overlay-card">
+      <button class="books-overlay-close" id="booksOverlayClose" aria-label="Close">&times;</button>
+      <span class="tag">Book List</span>
+      <div class="books-overlay-list" id="booksOverlayList"></div>
+    </div>
+  </div>
+
 <script>
 (function(){
   "use strict";
 
+  // ---------------------------------------------------------------
+  // CONFIG — one entry per Google Sheet tab. Edit sheetId once you
+  // have it; edit/add/remove SECTIONS if your tabs change.
+  //
+  // style "quote"  expects fields: { text, attribution, meta }
+  // style "term"   expects fields: { primary, tag, body, example }
+  // ---------------------------------------------------------------
   const CONFIG = {
     sheetId: "1NV4_3O7QdlHTyDJjkB1xSSJmTXxv5bYyBKgejkWIEgU",
     dailyCount: 1
@@ -339,18 +495,47 @@
     },
     {
       key: "dailylaw", sheetName: "Daily Law", title: "48 Laws of Power", style: "term",
+      // rotates: "sequential" — instead of the daily seeded shuffle used by
+      // the other sections, this one walks through the sheet's rows in
+      // order (Law 1, Law 2, Law 3, ...), one per day, wrapping back to
+      // the top after the last row. sequentialStart is the date Law 1
+      // (the first row) should show — change it if you re-sequence the
+      // sheet later.
       rotates: "sequential",
       sequentialStart: "2026-09-14",
       map: r => ({ primary: r.law, tag: r.number ? ("Law " + r.number) : "", body: r.summary, example: r.application })
     },
     {
       key: "dailyenforcement", sheetName: "Daily Enforcement", title: "Morning Mantra", style: "term",
+      // rotates: false — this one does NOT cycle daily. It always shows
+      // the LAST row in the sheet, so it stays fixed until you edit it
+      // (change that row's text, or add a new row below it) whenever
+      // your mindset/goals evolve.
       rotates: false,
       map: r => ({ primary: r.affirmation, tag: r.focus, body: r.reminder, example: "" })
+    },
+    {
+      // style "booklist" — unlike the other sections this one does NOT
+      // rotate a single pick per day. It's a running reference list: every
+      // row in the sheet shows up, newest first, so you can scan it when
+      // deciding what to read next.
+      key: "books", sheetName: "Books", title: "Book List", style: "booklist",
+      map: r => ({
+        title: r.title, author: r.author, dateAdded: r.date_added,
+        overview: r.overview, genre: r.genre, source: r.source, status: r.status
+      })
     }
   ];
 
+  // ---------------------------------------------------------------
+  // CSV fetch + parse (Google Sheets "gviz" endpoint — requires the
+  // sheet's sharing set to "Anyone with the link: Viewer").
+  // ---------------------------------------------------------------
   function sheetUrl(sheetName){
+    // The "&_=" cache-buster forces a fresh fetch every page load instead
+    // of letting the browser reuse a cached response from before you last
+    // edited the sheet (this is why an updated sheet can seem to "not
+    // show up" until a hard refresh — now it always fetches fresh).
     return "https://docs.google.com/spreadsheets/d/" + CONFIG.sheetId +
       "/gviz/tq?tqx=out:csv&sheet=" + encodeURIComponent(sheetName) +
       "&_=" + Date.now();
@@ -391,6 +576,11 @@
       .then(parseCsv);
   }
 
+  // ---------------------------------------------------------------
+  // Deterministic daily rotation: a fixed seeded shuffle (same order
+  // for everyone, every day) plus a day-based window, so the picks
+  // cycle through the whole list before repeating.
+  // ---------------------------------------------------------------
   function seededRandom(seed){
     let t = seed + 0x6D2B79F5;
     return function(){
@@ -443,14 +633,22 @@
     return picked;
   }
 
+  // ---------------------------------------------------------------
+  // Rendering
+  // ---------------------------------------------------------------
   function escapeHtml(s){
     return String(s || "").replace(/[&<>"']/g, m => ({
       "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
     }[m]));
   }
 
+  // Study mode (click a box to open flashcards) is built below but
+  // switched off for now — flip this to true to turn it back on.
   const ENABLE_STUDY_MODE = false;
 
+  // Soft pastel palette the boxes rotate through daily — same color
+  // for everyone on a given day, different sections get different
+  // colors, and the rotation cycles through the whole palette.
   const PASTELS = ["#BFE3D0", "#F5C6C6", "#D9CFF2", "#BBD8EF", "#F5E3B3", "#F3D9BE"];
   function colorForSection(index){
     const day = localDayNumber();
@@ -482,6 +680,75 @@
     `;
   }
 
+  // ---------------------------------------------------------------
+  // Book List — a running reference list rather than a daily pick.
+  // Newest (by date_added) first; the tile shows a scrollable preview
+  // and an "Expand list" button opens a larger fixed-size overlay with
+  // the same list rendered bigger, instead of dumping everything onto
+  // the page and making it endlessly long.
+  // ---------------------------------------------------------------
+  function parseDateSafe(s){
+    if(!s) return 0;
+    const t = Date.parse(s);
+    return isNaN(t) ? 0 : t;
+  }
+
+  function formatBookDate(s){
+    const t = Date.parse(s);
+    if(isNaN(t)) return s || "";
+    return new Date(t).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+  }
+
+  function sortBooksDesc(items){
+    return items.slice().sort((a, b) => parseDateSafe(b.dateAdded) - parseDateSafe(a.dateAdded));
+  }
+
+  function bookItemHtml(b){
+    const badges = [];
+    if(b.genre) badges.push(`<span class="book-badge">${escapeHtml(b.genre)}</span>`);
+    if(b.status) badges.push(`<span class="book-badge">${escapeHtml(b.status)}</span>`);
+    return `
+      <div class="book-item">
+        <div class="book-top">
+          <span class="book-title">${escapeHtml(b.title)}</span>
+          <span class="book-author">${b.author ? "by " + escapeHtml(b.author) : ""}</span>
+        </div>
+        <div class="book-meta">
+          ${badges.join("")}
+          ${b.dateAdded ? `<span class="book-date">Added ${escapeHtml(formatBookDate(b.dateAdded))}</span>` : ""}
+        </div>
+        ${b.overview ? `<p class="book-overview">${escapeHtml(b.overview)}</p>` : ""}
+        ${b.source ? `<p class="book-source">Source: ${escapeHtml(b.source)}</p>` : ""}
+      </div>
+    `;
+  }
+
+  function renderBooksBlock(section, mapped, el, errorMsg){
+    if(!mapped.length){
+      el.innerHTML = blockBodyHtml(section, null, errorMsg);
+      return;
+    }
+    const sorted = sortBooksDesc(mapped);
+    const listHtml = sorted.map(bookItemHtml).join("");
+    el.innerHTML = `
+      <span class="tag">${escapeHtml(section.title)}</span>
+      <div class="book-list">${listHtml}</div>
+      <button class="books-expand-btn" type="button">Expand list</button>
+    `;
+    el.querySelector(".books-expand-btn").addEventListener("click", () => openBooksOverlay(listHtml));
+  }
+
+  function openBooksOverlay(listHtml){
+    document.getElementById("booksOverlayList").innerHTML = listHtml;
+    document.getElementById("booksOverlay").hidden = false;
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeBooksOverlay(){
+    document.getElementById("booksOverlay").hidden = true;
+    document.body.style.overflow = "";
+  }
+
   function buildStaticDom(){
     const mosaic = document.getElementById("mosaic");
     mosaic.innerHTML = SECTIONS.map(s => `<div class="block" data-key="${s.key}"></div>`).join("");
@@ -500,6 +767,12 @@
       const raw = dataBySection[section.key] || [];
       const mapped = raw.map(section.map);
       SECTION_ITEMS[section.key] = mapped;
+      const el0 = document.querySelector('.block[data-key="' + section.key + '"]');
+      el0.style.background = colorForSection(i);
+      if(section.style === "booklist"){
+        renderBooksBlock(section, mapped, el0, errorsBySection[section.key]);
+        return;
+      }
       let current;
       if(section.rotates === false){
         current = mapped[mapped.length - 1];
@@ -508,8 +781,7 @@
       } else {
         current = pickToday(mapped, CONFIG.dailyCount, "homebase-hub-" + section.key)[0];
       }
-      const el = document.querySelector('.block[data-key="' + section.key + '"]');
-      el.style.background = colorForSection(i);
+      const el = el0;
       el.innerHTML = blockBodyHtml(section, current, errorsBySection[section.key]);
       if(ENABLE_STUDY_MODE){
         el.classList.toggle("has-items", mapped.length > 0);
@@ -518,6 +790,11 @@
     });
   }
 
+  // ---------------------------------------------------------------
+  // Study mode — click a box, cycle its items as flashcards, rate
+  // yourself, and let items you're still learning come back around
+  // more often. Progress is saved per-browser in localStorage.
+  // ---------------------------------------------------------------
   const PROGRESS_KEY = "homebase-hub-progress-v1";
 
   function loadProgress(){
@@ -541,7 +818,7 @@
     return hashText(section.style === "quote" ? item.text : item.primary);
   }
 
-  let study = null;
+  let study = null; // { key, section, items, queue, qPos, current, revealed }
 
   function boxFor(key, id){
     return (PROGRESS[key] && PROGRESS[key][id]) || 1;
@@ -658,6 +935,18 @@
     }
   });
 
+  document.getElementById("booksOverlayClose").addEventListener("click", closeBooksOverlay);
+  document.addEventListener("keydown", (e) => {
+    if(e.key !== "Escape") return;
+    const overlay = document.getElementById("booksOverlay");
+    if(overlay && !overlay.hidden) closeBooksOverlay();
+  });
+
+  // Promise.allSettled (not Promise.all) so ONE tab's sheet having a
+  // problem doesn't blank out every other tab — each section fetches and
+  // fails independently, and a failed section shows the actual error
+  // message in place of "TBD" so a real problem is easy to diagnose
+  // instead of looking identical to "you haven't added rows yet."
   Promise.allSettled(SECTIONS.map(s => fetchSheet(s.sheetName)))
     .then(results => {
       const dataBySection = {};
