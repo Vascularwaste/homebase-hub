@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Homebase Hub</title>
+<style>
+  :root{
+    --page: #f2f1ec;
+    --ink: #111111;
+    --ink-soft: rgba(17,17,17,0.62);
+    --bar: #F3C9D6;
+    --sans: 'Helvetica Neue', Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --seam: 6px;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI3NjAiIGhlaWdodD0iNzYwIiB2aWV3Qm94PSIwIDAgNzYwIDc2MCI+PHJlY3Qgd2lkdGg9Ijc2MCIgaGVpZ2h0PSI3NjAiIGZpbGw9IiNlZWY1ZmMiLz48ZyBmaWx0ZXI9InVybCgjc29mdCkiPjxwYXRoIGQ9Ik0gNjQ2LjEsNTA0LjAgUSA2ODguNiw1NjIuNiA2NTAuNiw2MzYuMiBRIDYxMi42LDcwOS44IDUyNC41LDc0Mi45IFEgNDM2LjMsNzc2LjAgNDAzLjIsNzA2LjIgUSAzNzAuMCw2MzYuNCAzMzcuMyw1NzguNiBRIDMwNC41LDUyMC44IDM1OS42LDQ0Ny44IFEgNDE0LjcsMzc0LjggNTA5LjEsNDEwLjEgUSA2MDMuNSw0NDUuNCA2NDYuMSw1MDQuMCBaIiBmaWxsPSIjY2ZlM2Y3Ii8+PHBhdGggZD0iTSA2NDYuMSwtMjU2LjAgUSA2ODguNiwtMTk3LjQgNjUwLjYsLTEyMy44IFEgNjEyLjYsLTUwLjIgNTI0LjUsLTE3LjEgUSA0MzYuMywxNi4wIDQwMy4yLC01My44IFEgMzcwLjAsLTEyMy42IDMzNy4zLC0xODEuNCBRIDMwNC41LC0yMzkuMiAzNTkuNiwtMzEyLjIgUSA0MTQuNywtMzg1LjIgNTA5LjEsLTM0OS45IFEgNjAzLjUsLTMxNC42IDY0Ni4xLC0yNTYuMCBaIiBmaWxsPSIjY2ZlM2Y3Ii8+PHBhdGggZD0iTSA0MDcuMCw2OTQuOSBRIDQzOS41LDc3MC4xIDQ0MS41LDgyMy41IFEgNDQzLjYsODc2LjkgMzQxLjcsODgwLjUgUSAyMzkuOCw4ODQuMSAyMDguMyw4NjYuOSBRIDE3Ni44LDg0OS43IDE1My44LDc2MS4xIFEgMTMwLjgsNjcyLjYgMjAzLjUsNjQ4LjggUSAyNzYuMSw2MjUuMSAzMjUuMyw2MjIuNSBRIDM3NC41LDYxOS44IDQwNy4wLDY5NC45IFoiIGZpbGw9IiNjZmUzZjciLz48cGF0aCBkPSJNIDQwNy4wLC02NS4xIFEgNDM5LjUsMTAuMSA0NDEuNSw2My41IFEgNDQzLjYsMTE2LjkgMzQxLjcsMTIwLjUgUSAyMzkuOCwxMjQuMSAyMDguMywxMDYuOSBRIDE3Ni44LDg5LjcgMTUzLjgsMS4xIFEgMTMwLjgsLTg3LjQgMjAzLjUsLTExMS4yIFEgMjc2LjEsLTEzNC45IDMyNS4zLC0xMzcuNSBRIDM3NC41LC0xNDAuMiA0MDcuMCwtNjUuMSBaIiBmaWxsPSIjY2ZlM2Y3Ii8+PHBhdGggZD0iTSAzNzEuMiw4OC40IFEgNDI2LjksMTg5LjYgMzU0LjAsMjYyLjkgUSAyODEuMSwzMzYuMyAyMDEuMiwzNTEuOCBRIDEyMS40LDM2Ny4zIDg2LjcsMjk5LjYgUSA1Mi4wLDIzMS45IDYyLjUsMTg5LjQgUSA3My4wLDE0Ni44IDEzMi43LDYxLjIgUSAxOTIuNCwtMjQuMyAyNTMuOSwtMTguNSBRIDMxNS41LC0xMi44IDM3MS4yLDg4LjQgWiIgZmlsbD0iI2NmZTNmNyIvPjxwYXRoIGQ9Ik0gMjExLjcsMTMzLjUgUSAyMzguMSwyMjQuMiAyNDIuNiwzMjAuOSBRIDI0Ny4xLDQxNy41IDE1Ny42LDQwNS4xIFEgNjguMSwzOTIuNyAtMjEuMiwzNTMuMiBRIC0xMTAuNCwzMTMuNyAtNzcuMCwyMzYuMSBRIC00My42LDE1OC41IC0xMC44LDEzNS4wIFEgMjIuMSwxMTEuNSAxMDMuNiw3Ny4yIFEgMTg1LjIsNDIuOCAyMTEuNywxMzMuNSBaIiBmaWxsPSIjY2ZlM2Y3Ii8+PHBhdGggZD0iTSA5NzEuNywxMzMuNSBRIDk5OC4xLDIyNC4yIDEwMDIuNiwzMjAuOSBRIDEwMDcuMSw0MTcuNSA5MTcuNiw0MDUuMSBRIDgyOC4xLDM5Mi43IDczOC44LDM1My4yIFEgNjQ5LjYsMzEzLjcgNjgzLjAsMjM2LjEgUSA3MTYuNCwxNTguNSA3NDkuMiwxMzUuMCBRIDc4Mi4xLDExMS41IDg2My42LDc3LjIgUSA5NDUuMiw0Mi44IDk3MS43LDEzMy41IFoiIGZpbGw9IiNjZmUzZjciLz48cGF0aCBkPSJNIDI4MC4zLC00NC4wIFEgMjg5LjAsMzcuOCAyODcuOSwxMjAuMCBRIDI4Ni44LDIwMi4yIDIwMC4wLDE4OC4zIFEgMTEzLjIsMTc0LjQgNTIuMSwxMzguOCBRIC05LjEsMTAzLjEgLTAuNyw2MS42IFEgNy43LDIwLjIgNzcuNywtNTEuNSBRIDE0Ny43LC0xMjMuMiAyMDkuNywtMTI0LjUgUSAyNzEuNywtMTI1LjggMjgwLjMsLTQ0LjAgWiIgZmlsbD0iI2NmZTNmNyIvPjxwYXRoIGQ9Ik0gMTA0MC4zLC00NC4wIFEgMTA0OS4wLDM3LjggMTA0Ny45LDEyMC4wIFEgMTA0Ni44LDIwMi4yIDk2MC4wLDE4OC4zIFEgODczLjIsMTc0LjQgODEyLjEsMTM4LjggUSA3NTAuOSwxMDMuMSA3NTkuMyw2MS42IFEgNzY3LjcsMjAuMiA4MzcuNywtNTEuNSBRIDkwNy43LC0xMjMuMiA5NjkuNywtMTI0LjUgUSAxMDMxLjcsLTEyNS44IDEwNDAuMywtNDQuMCBaIiBmaWxsPSIjY2ZlM2Y3Ii8+PHBhdGggZD0iTSAyODAuMyw3MTYuMCBRIDI4OS4wLDc5Ny44IDI4Ny45LDg4MC4wIFEgMjg2LjgsOTYyLjIgMjAwLjAsOTQ4LjMgUSAxMTMuMiw5MzQuNCA1Mi4xLDg5OC44IFEgLTkuMSw4NjMuMSAtMC43LDgyMS42IFEgNy43LDc4MC4yIDc3LjcsNzA4LjUgUSAxNDcuNyw2MzYuOCAyMDkuNyw2MzUuNSBRIDI3MS43LDYzNC4yIDI4MC4zLDcxNi4wIFoiIGZpbGw9IiNjZmUzZjciLz48cGF0aCBkPSJNIDEwNDAuMyw3MTYuMCBRIDEwNDkuMCw3OTcuOCAxMDQ3LjksODgwLjAgUSAxMDQ2LjgsOTYyLjIgOTYwLjAsOTQ4LjMgUSA4NzMuMiw5MzQuNCA4MTIuMSw4OTguOCBRIDc1MC45LDg2My4xIDc1OS4zLDgyMS42IFEgNzY3LjcsNzgwLjIgODM3LjcsNzA4LjUgUSA5MDcuNyw2MzYuOCA5NjkuNyw2MzUuNSBRIDEwMzEuNyw2MzQuMiAxMDQwLjMsNzE2LjAgWiIgZmlsbD0iI2NmZTNmNyIvPjxwYXRoIGQ9Ik0gMzc3LjksNDg3LjYgUSAzODkuOSw1NDQuNCAzODYuNCw2MjUuOCBRIDM4Mi45LDcwNy4yIDMxMi41LDcxMy4zIFEgMjQyLjEsNzE5LjMgMjE2LjgsNjc1LjIgUSAxOTEuNSw2MzEuMCAxNjAuMiw1NzQuMSBRIDEyOS4wLDUxNy4yIDE4Ni43LDQ1MS4wIFEgMjQ0LjUsMzg0LjggMzA1LjIsNDA3LjggUSAzNjUuOSw0MzAuOCAzNzcuOSw0ODcuNiBaIiBmaWxsPSIjOWRjM2VjIiBvcGFjaXR5PSIwLjg1Ii8+PHBhdGggZD0iTSAxOTkuMCw0ODkuNCBRIDIyMC4yLDU2OS44IDE4OS42LDYzNy4yIFEgMTU5LjAsNzA0LjUgMTAzLjQsNjkzLjkgUSA0Ny43LDY4My4zIC00LjUsNjYwLjQgUSAtNTYuOCw2MzcuNSAtMzYuNyw1NjcuOCBRIC0xNi43LDQ5OC4xIDIuOCw0NjcuOSBRIDIyLjQsNDM3LjYgMTAwLjEsNDIzLjMgUSAxNzcuOCw0MDkuMCAxOTkuMCw0ODkuNCBaIiBmaWxsPSIjOWRjM2VjIiBvcGFjaXR5PSIwLjg1Ii8+PHBhdGggZD0iTSA5NTkuMCw0ODkuNCBRIDk4MC4yLDU2OS44IDk0OS42LDYzNy4yIFEgOTE5LjAsNzA0LjUgODYzLjQsNjkzLjkgUSA4MDcuNyw2ODMuMyA3NTUuNSw2NjAuNCBRIDcwMy4yLDYzNy41IDcyMy4zLDU2Ny44IFEgNzQzLjMsNDk4LjEgNzYyLjgsNDY3LjkgUSA3ODIuNCw0MzcuNiA4NjAuMSw0MjMuMyBRIDkzNy44LDQwOS4wIDk1OS4wLDQ4OS40IFoiIGZpbGw9IiM5ZGMzZWMiIG9wYWNpdHk9IjAuODUiLz48cGF0aCBkPSJNIDY0MC4zLDE1MS4zIFEgNjU5LjYsMTk4LjUgNjMxLjksMjg4LjggUSA2MDQuMiwzNzkuMCA1MjMuNiwzODguMyBRIDQ0My4wLDM5Ny43IDQyMC4xLDM0OC4zIFEgMzk3LjIsMjk5LjAgMzYxLjYsMjMyLjUgUSAzMjUuOSwxNjUuOSAzOTguNCwxNDkuNSBRIDQ3MC44LDEzMy4xIDU0NS45LDExOC42IFEgNjIwLjksMTA0LjIgNjQwLjMsMTUxLjMgWiIgZmlsbD0iIzlkYzNlYyIgb3BhY2l0eT0iMC44NSIvPjxwYXRoIGQ9Ik0gNjgyLjQsNjY4LjAgUSA2OTcuMCw3MDUuMSA2OTIuNCw3NTQuNyBRIDY4Ny45LDgwNC4yIDY0MS4zLDgxOS4xIFEgNTk0LjgsODM0LjAgNTYyLjMsNzkwLjEgUSA1MjkuOCw3NDYuMiA1MDQuMiw3MDUuMiBRIDQ3OC43LDY2NC4yIDUyOS4wLDYzOC40IFEgNTc5LjQsNjEyLjYgNjIzLjYsNjIxLjggUSA2NjcuOSw2MzAuOSA2ODIuNCw2NjguMCBaIiBmaWxsPSIjOWRjM2VjIiBvcGFjaXR5PSIwLjg1Ii8+PHBhdGggZD0iTSA2ODIuNCwtOTIuMCBRIDY5Ny4wLC01NC45IDY5Mi40LC01LjMgUSA2ODcuOSw0NC4yIDY0MS4zLDU5LjEgUSA1OTQuOCw3NC4wIDU2Mi4zLDMwLjEgUSA1MjkuOCwtMTMuOCA1MDQuMiwtNTQuOCBRIDQ3OC43LC05NS44IDUyOS4wLC0xMjEuNiBRIDU3OS40LC0xNDcuNCA2MjMuNiwtMTM4LjIgUSA2NjcuOSwtMTI5LjEgNjgyLjQsLTkyLjAgWiIgZmlsbD0iIzlkYzNlYyIgb3BhY2l0eT0iMC44NSIvPjwvZz48ZGVmcz48ZmlsdGVyIGlkPSJzb2Z0IiB4PSItMzAlIiB5PSItMzAlIiB3aWR0aD0iMTYwJSIgaGVpZ2h0PSIxNjAlIj48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIyMiIvPjwvZmlsdGVyPjwvZGVmcz48L3N2Zz4=");
+    background-repeat: repeat;
+    background-size: 760px 760px;
+    background-position: 0 0;
+    background-attachment: fixed;
+  }
+
+  .topbar{
+    background: var(--bar);
+    border-bottom: 3px solid var(--ink);
+  }
+  .topbar-inner{
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .wordmark{
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .date-pill{
+    border: 2.5px solid var(--ink);
+    border-radius: 999px;
+    padding: 7px 18px;
+    font-weight: 800;
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .banner{
+    max-width: 1600px;
+    margin: 16px auto 0;
+    padding: 0 20px;
+  }
+  .banner-inner{
+    background: var(--ink);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 8px;
+    text-align: center;
+  }
+
+  .stage{
+    max-width: 1600px;
+    margin: 20px auto 40px;
+    padding: 0 20px;
+  }
+
+  .mosaic{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-areas:
+      "enforcement enforcement"
+      "quotes dictionary"
+      "phrases law";
+    gap: var(--seam);
+    border: 3px solid var(--ink);
+  }
+  @media (max-width: 760px){
+    .mosaic{
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "enforcement"
+        "quotes"
+        "dictionary"
+        "phrases"
+        "law";
+    }
+  }
+
+  .block{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 30px 28px;
+    min-height: 200px;
+    overflow: hidden;
+  }
+  .block[data-key="quotes"]{ grid-area: quotes; }
+  .block[data-key="dictionary"]{ grid-area: dictionary; }
+  .block[data-key="phrases"]{ grid-area: phrases; }
+  .block[data-key="dailylaw"]{ grid-area: law; }
+  .block[data-key="dailyenforcement"]{ grid-area: enforcement; min-height: 280px; }
+
+  .block .tag{
+    display: inline-block;
+    align-self: flex-start;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    background: rgba(255,255,255,0.35);
+  }
+  .block .headline{
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 1.05;
+    margin: 0 0 12px;
+    text-wrap: balance;
+  }
+  .block .headline{ font-size: clamp(24px, 2.7vw, 36px); text-transform: uppercase; }
+
+  .block .support{
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+    opacity: 0.72;
+    text-transform: uppercase;
+  }
+  .block .sub{
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    opacity: 0.6;
+    margin-top: 6px;
+    font-style: italic;
+  }
+  .block .empty{
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0.6;
+  }
+
+  footer.site{
+    max-width: 1600px;
+    margin: 0 auto 32px;
+    padding: 0 20px;
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 12px;
+  }
+
+  .block.has-items{ cursor: pointer; transition: filter 0.15s ease; }
+  .block.has-items:hover{ filter: brightness(0.96); }
+  .block.has-items:active{ filter: brightness(0.9); }
+  .study-hint{
+    position: absolute;
+    right: 20px;
+    bottom: 16px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    opacity: 0.55;
+  }
+
+  .study-overlay{
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .study-overlay[hidden]{ display: none; }
+  .study-close{
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    border: 2.5px solid var(--ink);
+    background: rgba(255,255,255,0.5);
+    font-size: 18px;
+    font-weight: 800;
+    cursor: pointer;
+    color: var(--ink);
+  }
+  .study-progress{
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: rgba(255,255,255,0.5);
+  }
+  .study-card{
+    background: #fff;
+    border: 3px solid var(--ink);
+    max-width: 640px;
+    width: 100%;
+    min-height: 360px;
+    padding: 44px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    gap: 18px;
+  }
+  .study-tag{
+    align-self: center;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .study-front{
+    font-weight: 900;
+    font-size: clamp(24px, 4vw, 38px);
+    line-height: 1.15;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
+  .block[data-key="quotes"] ~ .study-overlay .study-front,
+  .study-overlay.quote-mode .study-front{ text-transform: none; }
+  .study-back{
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    border-top: 2px solid var(--line, #ddd);
+    padding-top: 16px;
+  }
+  .study-back.visible{ display: flex; }
+  .study-back .b1{ font-size: 17px; font-weight: 700; }
+  .study-back .b2{ font-size: 14px; font-style: italic; opacity: 0.65; }
+  .study-actions{
+    margin-top: 8px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .study-btn{
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    padding: 14px 28px;
+    border-radius: 999px;
+    border: 2.5px solid var(--ink);
+    cursor: pointer;
+    background: #fff;
+    color: var(--ink);
+  }
+  .study-btn.primary{ background: var(--ink); color: #fff; }
+  .study-btn.learning{ background: #fff; }
+  .study-btn.got-it{ background: var(--ink); color: #fff; }
+  .study-done{
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="wordmark">Homebase Hub</div>
+      <div class="date-pill" id="todayDate"></div>
+    </div>
+  </div>
+
+  <div class="banner">
+    <div id="sampleBanner" class="banner-inner" hidden></div>
+  </div>
+
+  <div class="stage">
+    <div class="mosaic" id="mosaic"></div>
+  </div>
+
+  <footer class="site">Homebase Hub — refreshes automatically every day.</footer>
+
+  <div class="study-overlay" id="studyOverlay" hidden>
+    <button class="study-close" id="studyClose" aria-label="Close">&times;</button>
+    <div class="study-progress" id="studyProgress"></div>
+    <div class="study-card" id="studyCard"></div>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+
+  const CONFIG = {
+    sheetId: "1NV4_3O7QdlHTyDJjkB1xSSJmTXxv5bYyBKgejkWIEgU",
+    dailyCount: 1
+  };
+
+  const SECTIONS = [
+    {
+      key: "quotes", sheetName: "Quotes", title: "Quote", style: "quote",
+      map: r => ({ text: r.quote, attribution: r.author, meta: r.source })
+    },
+    {
+      key: "dictionary", sheetName: "Dictionary", title: "Dictionary", style: "term",
+      map: r => ({ primary: r.word, tag: r.part_of_speech, body: r.definition, example: r.example })
+    },
+    {
+      key: "phrases", sheetName: "Phrases", title: "Phrase", style: "term",
+      map: r => ({ primary: r.phrase, tag: "", body: r.meaning, example: r.example })
+    },
+    {
+      key: "dailylaw", sheetName: "Daily Law", title: "48 Laws of Power", style: "term",
+      rotates: "sequential",
+      sequentialStart: "2026-09-14",
+      map: r => ({ primary: r.law, tag: r.number ? ("Law " + r.number) : "", body: r.summary, example: r.application })
+    },
+    {
+      key: "dailyenforcement", sheetName: "Daily Enforcement", title: "Morning Mantra", style: "term",
+      rotates: false,
+      map: r => ({ primary: r.affirmation, tag: r.focus, body: r.reminder, example: "" })
+    }
+  ];
+
+  function sheetUrl(sheetName){
+    return "https://docs.google.com/spreadsheets/d/" + CONFIG.sheetId +
+      "/gviz/tq?tqx=out:csv&sheet=" + encodeURIComponent(sheetName) +
+      "&_=" + Date.now();
+  }
+
+  function parseCsv(text){
+    const rows = [];
+    let row = [], field = "", inQuotes = false;
+    for(let i = 0; i < text.length; i++){
+      const c = text[i], next = text[i+1];
+      if(inQuotes){
+        if(c === '"' && next === '"'){ field += '"'; i++; }
+        else if(c === '"'){ inQuotes = false; }
+        else { field += c; }
+      } else {
+        if(c === '"'){ inQuotes = true; }
+        else if(c === ','){ row.push(field); field = ""; }
+        else if(c === '\n'){ row.push(field); rows.push(row); row = []; field = ""; }
+        else if(c === '\r'){ /* skip */ }
+        else { field += c; }
+      }
+    }
+    if(field.length || row.length){ row.push(field); rows.push(row); }
+    if(!rows.length) return [];
+    const headers = rows[0].map(h => h.trim().toLowerCase().replace(/\s+/g,'_'));
+    return rows.slice(1)
+      .filter(r => r.some(cell => cell && cell.trim().length))
+      .map(r => {
+        const obj = {};
+        headers.forEach((h, idx) => { obj[h] = (r[idx] || "").trim(); });
+        return obj;
+      });
+  }
+
+  function fetchSheet(sheetName){
+    return fetch(sheetUrl(sheetName), { cache: "no-store" })
+      .then(res => { if(!res.ok) throw new Error("bad status " + res.status); return res.text(); })
+      .then(parseCsv);
+  }
+
+  function seededRandom(seed){
+    let t = seed + 0x6D2B79F5;
+    return function(){
+      t += 0x6D2B79F5;
+      let r = Math.imul(t ^ (t >>> 15), 1 | t);
+      r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r;
+      return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function seededShuffleIndices(n, seedString){
+    let seed = 0;
+    for(let i = 0; i < seedString.length; i++){ seed = (seed * 31 + seedString.charCodeAt(i)) >>> 0; }
+    const rand = seededRandom(seed);
+    const idx = Array.from({length:n}, (_, i) => i);
+    for(let i = n - 1; i > 0; i--){
+      const j = Math.floor(rand() * (i + 1));
+      [idx[i], idx[j]] = [idx[j], idx[i]];
+    }
+    return idx;
+  }
+
+  function localDayNumber(){
+    const d = new Date();
+    const midnight = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    return Math.floor(midnight.getTime() / 86400000);
+  }
+
+  function sequentialIndex(n, startDateStr){
+    if(n <= 0) return 0;
+    const day = localDayNumber();
+    const start = new Date(startDateStr + "T00:00:00");
+    const epoch = Math.floor(new Date(start.getFullYear(), start.getMonth(), start.getDate()).getTime() / 86400000);
+    let idx = (day - epoch) % n;
+    if(idx < 0) idx += n;
+    return idx;
+  }
+
+  function pickToday(items, count, seedString){
+    const n = items.length;
+    if(n === 0) return [];
+    if(n <= count) return items.slice();
+    const order = seededShuffleIndices(n, seedString);
+    const day = localDayNumber();
+    const base = (day * count) % n;
+    const picked = [];
+    for(let k = 0; k < count; k++){
+      picked.push(items[order[(base + k) % n]]);
+    }
+    return picked;
+  }
+
+  function escapeHtml(s){
+    return String(s || "").replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[m]));
+  }
+
+  const ENABLE_STUDY_MODE = false;
+
+  const PASTELS = ["#BFE3D0", "#F5C6C6", "#D9CFF2", "#BBD8EF", "#F5E3B3", "#F3D9BE"];
+  function colorForSection(index){
+    const day = localDayNumber();
+    return PASTELS[(day + index) % PASTELS.length];
+  }
+
+  function blockBodyHtml(section, item, errorMsg){
+    const hint = ENABLE_STUDY_MODE ? '<span class="study-hint">STUDY&nbsp;&rarr;</span>' : "";
+    if(!item){
+      if(errorMsg){
+        return `<span class="tag">${escapeHtml(section.title)}</span><p class="headline">Couldn't load</p><p class="support">${escapeHtml(errorMsg)}</p>`;
+      }
+      return `<span class="tag">${escapeHtml(section.title)}</span><p class="headline">TBD</p><p class="support">BEN START ADDING ITEMS</p>`;
+    }
+    if(section.style === "quote"){
+      return `
+        <span class="tag">${escapeHtml(section.title)}</span>
+        <p class="headline">${escapeHtml(item.text)}</p>
+        <p class="support">${escapeHtml(item.attribution || "Unknown")}${item.meta ? " — " + escapeHtml(item.meta) : ""}</p>
+        ${hint}
+      `;
+    }
+    return `
+      <span class="tag">${escapeHtml(item.tag) || escapeHtml(section.title)}</span>
+      <p class="headline">${escapeHtml(item.primary)}</p>
+      <p class="support">${escapeHtml(item.body)}</p>
+      ${item.example ? `<p class="sub">${escapeHtml(item.example)}</p>` : ""}
+      ${hint}
+    `;
+  }
+
+  function buildStaticDom(){
+    const mosaic = document.getElementById("mosaic");
+    mosaic.innerHTML = SECTIONS.map(s => `<div class="block" data-key="${s.key}"></div>`).join("");
+  }
+
+  document.getElementById("todayDate").textContent = new Date().toLocaleDateString(undefined, {
+    weekday: "short", month: "short", day: "numeric"
+  });
+
+  const SECTION_ITEMS = {};
+
+  function boot(dataBySection, errorsBySection){
+    errorsBySection = errorsBySection || {};
+    buildStaticDom();
+    SECTIONS.forEach((section, i) => {
+      const raw = dataBySection[section.key] || [];
+      const mapped = raw.map(section.map);
+      SECTION_ITEMS[section.key] = mapped;
+      let current;
+      if(section.rotates === false){
+        current = mapped[mapped.length - 1];
+      } else if(section.rotates === "sequential"){
+        current = mapped.length ? mapped[sequentialIndex(mapped.length, section.sequentialStart)] : undefined;
+      } else {
+        current = pickToday(mapped, CONFIG.dailyCount, "homebase-hub-" + section.key)[0];
+      }
+      const el = document.querySelector('.block[data-key="' + section.key + '"]');
+      el.style.background = colorForSection(i);
+      el.innerHTML = blockBodyHtml(section, current, errorsBySection[section.key]);
+      if(ENABLE_STUDY_MODE){
+        el.classList.toggle("has-items", mapped.length > 0);
+        el.addEventListener("click", () => { if(mapped.length) openStudy(section.key); });
+      }
+    });
+  }
+
+  const PROGRESS_KEY = "homebase-hub-progress-v1";
+
+  function loadProgress(){
+    try{
+      const raw = localStorage.getItem(PROGRESS_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch(e){ return {}; }
+  }
+  function saveProgress(p){
+    try{ localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); } catch(e){ /* ignore */ }
+  }
+  let PROGRESS = loadProgress();
+
+  function hashText(s){
+    let h = 5381;
+    const str = String(s || "");
+    for(let i = 0; i < str.length; i++){ h = ((h * 33) ^ str.charCodeAt(i)) >>> 0; }
+    return h.toString(36);
+  }
+  function itemId(section, item){
+    return hashText(section.style === "quote" ? item.text : item.primary);
+  }
+
+  let study = null;
+
+  function boxFor(key, id){
+    return (PROGRESS[key] && PROGRESS[key][id]) || 1;
+  }
+  function setBox(key, id, box){
+    if(!PROGRESS[key]) PROGRESS[key] = {};
+    PROGRESS[key][id] = box;
+    saveProgress(PROGRESS);
+  }
+
+  function buildQueue(key, items){
+    const weighted = [];
+    items.forEach((item, idx) => {
+      const box = boxFor(key, itemId(SECTIONS.find(s => s.key === key), item));
+      const weight = box <= 1 ? 4 : box === 2 ? 2 : 1;
+      for(let w = 0; w < weight; w++) weighted.push(idx);
+    });
+    for(let i = weighted.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [weighted[i], weighted[j]] = [weighted[j], weighted[i]];
+    }
+    return weighted;
+  }
+
+  function masteredCount(key, items, section){
+    return items.filter(it => boxFor(key, itemId(section, it)) >= 3).length;
+  }
+
+  function openStudy(key){
+    const section = SECTIONS.find(s => s.key === key);
+    const items = SECTION_ITEMS[key] || [];
+    if(!items.length) return;
+    study = { key, section, items, queue: buildQueue(key, items), qPos: 0, revealed: false };
+    document.getElementById("studyOverlay").style.background = getComputedStyle(
+      document.querySelector('.block[data-key="' + key + '"]')
+    ).backgroundColor;
+    document.getElementById("studyOverlay").hidden = false;
+    document.body.style.overflow = "hidden";
+    renderStudyCard();
+  }
+
+  function closeStudy(){
+    study = null;
+    document.getElementById("studyOverlay").hidden = true;
+    document.body.style.overflow = "";
+  }
+
+  function renderStudyCard(){
+    if(!study) return;
+    if(study.qPos >= study.queue.length){
+      study.queue = buildQueue(study.key, study.items);
+      study.qPos = 0;
+    }
+    const idx = study.queue[study.qPos];
+    const item = study.items[idx];
+    study.current = item;
+    study.revealed = false;
+
+    const mastered = masteredCount(study.key, study.items, study.section);
+    document.getElementById("studyProgress").textContent =
+      escapeHtml(study.section.title) + " · " + mastered + " / " + study.items.length + " mastered";
+
+    const front = study.section.style === "quote" ? item.text : item.primary;
+    const card = document.getElementById("studyCard");
+    card.innerHTML = `
+      <span class="study-tag">${escapeHtml(study.section.title)}</span>
+      <p class="study-front">${escapeHtml(front)}</p>
+      <div class="study-back" id="studyBack"></div>
+      <div class="study-actions" id="studyActions">
+        <button class="study-btn primary" id="studyReveal">Reveal</button>
+      </div>
+    `;
+    document.getElementById("studyReveal").addEventListener("click", revealStudyCard);
+  }
+
+  function revealStudyCard(){
+    if(!study || study.revealed) return;
+    study.revealed = true;
+    const item = study.current;
+    const back = document.getElementById("studyBack");
+    if(study.section.style === "quote"){
+      back.innerHTML = `<p class="b1">${escapeHtml(item.attribution || "Unknown")}${item.meta ? " — " + escapeHtml(item.meta) : ""}</p>`;
+    } else {
+      back.innerHTML = `
+        <p class="b1">${escapeHtml(item.body)}</p>
+        ${item.example ? `<p class="b2">${escapeHtml(item.example)}</p>` : ""}
+      `;
+    }
+    back.classList.add("visible");
+    document.getElementById("studyActions").innerHTML = `
+      <button class="study-btn learning" id="studyLearning">Still learning</button>
+      <button class="study-btn got-it" id="studyGotIt">Got it</button>
+    `;
+    document.getElementById("studyLearning").addEventListener("click", () => rateStudyCard(1));
+    document.getElementById("studyGotIt").addEventListener("click", () => rateStudyCard(null));
+  }
+
+  function rateStudyCard(forceBox){
+    if(!study) return;
+    const id = itemId(study.section, study.current);
+    const box = forceBox !== null ? forceBox : Math.min(3, boxFor(study.key, id) + 1);
+    setBox(study.key, id, box);
+    study.qPos++;
+    renderStudyCard();
+  }
+
+  document.getElementById("studyClose").addEventListener("click", closeStudy);
+  document.addEventListener("keydown", (e) => {
+    if(!study) return;
+    if(e.key === "Escape") closeStudy();
+    if(e.key === "Enter" || e.key === " "){
+      e.preventDefault();
+      if(!study.revealed) revealStudyCard();
+    }
+  });
+
+  Promise.allSettled(SECTIONS.map(s => fetchSheet(s.sheetName)))
+    .then(results => {
+      const dataBySection = {};
+      const errorsBySection = {};
+      let anyError = false;
+      SECTIONS.forEach((s, i) => {
+        const r = results[i];
+        if(r.status === "fulfilled"){
+          dataBySection[s.key] = r.value;
+        } else {
+          dataBySection[s.key] = [];
+          errorsBySection[s.key] = (r.reason && r.reason.message) ? r.reason.message : String(r.reason);
+          anyError = true;
+        }
+      });
+      if(anyError){
+        document.getElementById("sampleBanner").hidden = false;
+        document.getElementById("sampleBanner").textContent =
+          "Some tabs couldn't be loaded from your Google Sheet — see the affected box(es) below for the specific error.";
+      }
+      boot(dataBySection, errorsBySection);
+    });
+})();
+</script>
+</body>
+</html>
