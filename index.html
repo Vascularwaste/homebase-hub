@@ -298,9 +298,29 @@
   /* avatar, title + overview subline, colored genre/status pills, */
   /* a link chip for source, plain date) rather than stacked cards.*/
   /* ------------------------------------------------------------ */
+  .book-genre-filter{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 10px 0 12px;
+  }
+  .genre-filter-chip{
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1.5px solid rgba(17,17,17,0.15);
+    background: #fff;
+    color: rgba(17,17,17,0.6);
+    user-select: none;
+  }
+  .genre-filter-chip:hover{ border-color: rgba(17,17,17,0.35); }
+  .genre-filter-chip.active{ border-color: transparent; }
   .book-list{
     width: 100%;
-    max-height: 260px;
+    max-height: 420px;
     overflow: auto;
     border: 1.5px solid rgba(17,17,17,0.14);
     border-radius: 10px;
@@ -328,12 +348,6 @@
     color: rgba(17,17,17,0.45);
     white-space: nowrap;
   }
-  .book-th[data-sort-key]{
-    cursor: pointer;
-    user-select: none;
-  }
-  .book-th[data-sort-key]:hover{ color: rgba(17,17,17,0.8); }
-
   .book-tr{
     border-bottom: 1px solid rgba(17,17,17,0.08);
     transition: background 0.12s ease;
@@ -422,75 +436,6 @@
     opacity: 0.65;
     white-space: nowrap;
   }
-
-  .books-expand-btn{
-    align-self: flex-start;
-    margin-top: 16px;
-    font-family: var(--sans);
-    font-weight: 800;
-    font-size: 12px;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    padding: 9px 20px;
-    border-radius: 999px;
-    border: 2px solid var(--ink);
-    background: rgba(255,255,255,0.6);
-    color: var(--ink);
-    cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease;
-  }
-  .books-expand-btn:hover{ background: var(--ink); color: #fff; }
-
-  .books-overlay{
-    position: fixed;
-    inset: 0;
-    z-index: 60;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    background: rgba(17,17,17,0.45);
-  }
-  .books-overlay[hidden]{ display: none; }
-  .books-overlay-card{
-    position: relative;
-    background: #fff;
-    border: 3px solid var(--ink);
-    width: 100%;
-    max-width: 760px;
-    height: 80vh;
-    max-height: 720px;
-    padding: 44px 36px 32px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-  }
-  .books-overlay-close{
-    position: absolute;
-    top: 18px;
-    right: 22px;
-    width: 40px;
-    height: 40px;
-    border-radius: 999px;
-    border: 2.5px solid var(--ink);
-    background: #fff;
-    font-size: 18px;
-    font-weight: 800;
-    cursor: pointer;
-    color: var(--ink);
-  }
-  .books-overlay-list{
-    flex: 1;
-    overflow: auto;
-    border: 1.5px solid rgba(17,17,17,0.14);
-    border-radius: 10px;
-    background: #fff;
-  }
-  .books-overlay-list .book-th,
-  .books-overlay-list .book-td{ padding: 14px 18px; }
-  .books-overlay-list .book-title{ font-size: 15px; white-space: normal; }
-  .books-overlay-list .book-overview-sub{ font-size: 12.5px; -webkit-line-clamp: 3; }
-
 </style>
 </head>
 <body>
@@ -515,14 +460,6 @@
     <button class="study-close" id="studyClose" aria-label="Close">&times;</button>
     <div class="study-progress" id="studyProgress"></div>
     <div class="study-card" id="studyCard"></div>
-  </div>
-
-  <div class="books-overlay" id="booksOverlay" hidden>
-    <div class="books-overlay-card">
-      <button class="books-overlay-close" id="booksOverlayClose" aria-label="Close">&times;</button>
-      <span class="tag">Book List</span>
-      <div class="books-overlay-list" id="booksOverlayList"></div>
-    </div>
   </div>
 
 <script>
@@ -827,43 +764,31 @@
     `;
   }
 
-  // Generic sort: "dateAdded" compares as dates (newest first by default),
-  // every other key compares as case-insensitive text. dir is "asc"/"desc".
-  function sortBooksBy(items, key, dir){
-    const mul = dir === "asc" ? 1 : -1;
-    return items.slice().sort((a, b) => {
-      if(key === "dateAdded"){
-        return mul * (parseDateSafe(a.dateAdded) - parseDateSafe(b.dateAdded));
-      }
-      const av = (a[key] || "").toString().toLowerCase();
-      const bv = (b[key] || "").toString().toLowerCase();
-      if(av < bv) return -1 * mul;
-      if(av > bv) return 1 * mul;
-      return 0;
-    });
-  }
-
-  function sortArrow(activeKey, key, dir){
-    if(activeKey !== key) return "";
-    return dir === "asc" ? " ▲" : " ▼";
-  }
-
-  function bookTableHtml(sorted, sortKey, sortDir){
-    sortKey = sortKey || "dateAdded";
-    sortDir = sortDir || "desc";
+  function bookTableHtml(sorted){
     return `
       <div class="book-table">
         <div class="book-table-head">
-          <div class="book-th th-title" data-sort-key="title">Title${sortArrow(sortKey, "title", sortDir)}</div>
-          <div class="book-th th-author" data-sort-key="author">Author${sortArrow(sortKey, "author", sortDir)}</div>
-          <div class="book-th th-genre" data-sort-key="genre">Genre${sortArrow(sortKey, "genre", sortDir)}</div>
-          <div class="book-th th-status" data-sort-key="status">Status${sortArrow(sortKey, "status", sortDir)}</div>
+          <div class="book-th th-title">Title</div>
+          <div class="book-th th-author">Author</div>
+          <div class="book-th th-genre">Genre</div>
+          <div class="book-th th-status">Status</div>
           <div class="book-th th-source">Source</div>
-          <div class="book-th th-date" data-sort-key="dateAdded">Added${sortArrow(sortKey, "dateAdded", sortDir)}</div>
+          <div class="book-th th-date">Added</div>
         </div>
         <div class="book-table-body">${sorted.map(bookRowHtml).join("")}</div>
       </div>
     `;
+  }
+
+  function genreFilterHtml(genres, active){
+    const chips = [`<button type="button" class="genre-filter-chip${active === "all" ? " active" : ""}" data-genre="all"${active === "all" ? ' style="background:var(--ink);color:#fff;border-color:var(--ink);"' : ""}>All</button>`];
+    genres.forEach(g => {
+      const isActive = active === g;
+      const c = tagColor(g);
+      const style = isActive ? ` style="background:${c.bg};color:${c.fg};border-color:${c.bg};"` : "";
+      chips.push(`<button type="button" class="genre-filter-chip${isActive ? " active" : ""}" data-genre="${escapeHtml(g)}"${style}>${escapeHtml(g)}</button>`);
+    });
+    return chips.join("");
   }
 
   function renderBooksBlock(section, mapped, el, errorMsg){
@@ -871,45 +796,26 @@
       el.innerHTML = blockBodyHtml(section, null, errorMsg);
       return;
     }
-    let sortKey = "dateAdded";
-    let sortDir = "desc";
+    const genres = Array.from(new Set(mapped.map(b => b.genre).filter(Boolean))).sort((a, b) => a.localeCompare(b));
+    let activeGenre = "all";
 
     function draw(){
-      const sorted = sortBooksBy(mapped, sortKey, sortDir);
-      const tableHtml = bookTableHtml(sorted, sortKey, sortDir);
+      const filtered = activeGenre === "all" ? mapped : mapped.filter(b => (b.genre || "") === activeGenre);
+      const sorted = sortBooksDesc(filtered);
+      const tableHtml = bookTableHtml(sorted);
       el.innerHTML = `
         <span class="tag">${escapeHtml(section.title)}</span>
+        ${genres.length ? `<div class="book-genre-filter">${genreFilterHtml(genres, activeGenre)}</div>` : ""}
         <div class="book-list">${tableHtml}</div>
-        <button class="books-expand-btn" type="button">Expand list</button>
       `;
-      el.querySelectorAll(".book-th[data-sort-key]").forEach(th => {
-        th.addEventListener("click", () => {
-          const key = th.getAttribute("data-sort-key");
-          if(sortKey === key){
-            sortDir = sortDir === "asc" ? "desc" : "asc";
-          } else {
-            sortKey = key;
-            sortDir = "asc";
-          }
+      el.querySelectorAll(".genre-filter-chip").forEach(btn => {
+        btn.addEventListener("click", () => {
+          activeGenre = btn.getAttribute("data-genre");
           draw();
         });
       });
-      el.querySelector(".books-expand-btn").addEventListener("click", () => openBooksOverlay(bookTableHtml(sorted, sortKey, sortDir)));
     }
     draw();
-  }
-
-
-
-  function openBooksOverlay(listHtml){
-    document.getElementById("booksOverlayList").innerHTML = listHtml;
-    document.getElementById("booksOverlay").hidden = false;
-    document.body.style.overflow = "hidden";
-  }
-
-  function closeBooksOverlay(){
-    document.getElementById("booksOverlay").hidden = true;
-    document.body.style.overflow = "";
   }
 
   function buildStaticDom(){
@@ -1096,13 +1002,6 @@
       e.preventDefault();
       if(!study.revealed) revealStudyCard();
     }
-  });
-
-  document.getElementById("booksOverlayClose").addEventListener("click", closeBooksOverlay);
-  document.addEventListener("keydown", (e) => {
-    if(e.key !== "Escape") return;
-    const overlay = document.getElementById("booksOverlay");
-    if(overlay && !overlay.hidden) closeBooksOverlay();
   });
 
   // Promise.allSettled (not Promise.all) so ONE tab's sheet having a
