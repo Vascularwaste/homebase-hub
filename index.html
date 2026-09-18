@@ -795,6 +795,15 @@
     let activeGenre = "all";
 
     function draw(){
+      // Rebuilding el.innerHTML replaces the .book-list div outright, so a
+      // fresh (unscrolled) element would normally reset the visible scroll
+      // position to the top every time a filter chip is clicked. Capture the
+      // outgoing scroll position first and re-apply it to the new element
+      // (the browser clamps it automatically if the new list is shorter),
+      // so switching filters never yanks you back to the top of the list.
+      const prevList = el.querySelector(".book-list");
+      const savedScrollTop = prevList ? prevList.scrollTop : 0;
+
       const filtered = activeGenre === "all" ? mapped : mapped.filter(b => (b.genre || "") === activeGenre);
       const sorted = sortBooksDesc(filtered);
       const tableHtml = bookTableHtml(sorted);
@@ -803,6 +812,8 @@
         ${genres.length ? `<div class="book-genre-filter">${genreFilterHtml(genres, activeGenre)}</div>` : ""}
         <div class="book-list">${tableHtml}</div>
       `;
+      const newList = el.querySelector(".book-list");
+      if(newList) newList.scrollTop = savedScrollTop;
       el.querySelectorAll(".genre-filter-chip").forEach(btn => {
         btn.addEventListener("click", () => {
           activeGenre = btn.getAttribute("data-genre");
