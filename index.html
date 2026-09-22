@@ -386,10 +386,10 @@
     border-radius: 10px;
     background: #fff;
   }
-  .book-table{ min-width: 780px; width: 100%; }
+  .book-table{ min-width: 860px; width: 100%; }
   .book-table-head, .book-tr{
     display: grid;
-    grid-template-columns: 1.3fr 2.2fr 0.85fr 0.8fr 0.8fr 1fr 0.75fr;
+    grid-template-columns: 1.3fr 2.2fr 0.85fr 0.8fr 0.8fr 1fr 0.75fr 0.6fr;
     align-items: start;
   }
   .book-table-head{
@@ -488,6 +488,13 @@
     font-size: 12px;
     font-weight: 600;
     opacity: 0.65;
+    white-space: nowrap;
+  }
+  .td-pages{
+    font-size: 12px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    opacity: 0.7;
     white-space: nowrap;
   }
 </style>
@@ -647,7 +654,8 @@
       key: "books", sheetName: "Books", title: "Book List", style: "booklist",
       map: r => ({
         title: r.title, author: r.author, dateAdded: r.date_added,
-        overview: r.overview, genre: r.genre, source: r.source, status: r.status
+        overview: r.overview, genre: r.genre, source: r.source, status: r.status,
+        pages: r.page_count
       })
     }
   ];
@@ -887,6 +895,7 @@
         <div class="book-td td-status">${pillHtml(b.status)}</div>
         <div class="book-td td-source">${sourceChipHtml(b.source)}</div>
         <div class="book-td td-date">${b.dateAdded ? escapeHtml(formatBookDate(b.dateAdded)) : ""}</div>
+        <div class="book-td td-pages">${b.pages ? escapeHtml(b.pages) : ""}</div>
       </div>
     `;
   }
@@ -902,6 +911,7 @@
           <div class="book-th th-status">Status</div>
           <div class="book-th th-source">Source</div>
           <div class="book-th th-date">Added</div>
+          <div class="book-th th-pages">Pages</div>
         </div>
         <div class="book-table-body">${sorted.map(bookRowHtml).join("")}</div>
       </div>
