@@ -145,6 +145,7 @@
       "enforcement enforcement"
       "quotes dictionary"
       "phrases law"
+      "gracian gracian"
       "books books";
     gap: var(--seam);
     border: 3px solid var(--ink);
@@ -158,6 +159,7 @@
         "dictionary"
         "phrases"
         "law"
+        "gracian"
         "books";
     }
   }
@@ -177,6 +179,7 @@
   .block[data-key="phrases"]{ grid-area: phrases; }
   .block[data-key="dailylaw"]{ grid-area: law; }
   .block[data-key="dailyenforcement"]{ grid-area: enforcement; min-height: 280px; }
+  .block[data-key="gracian"]{ grid-area: gracian; min-height: 280px; }
   .block[data-key="books"]{ grid-area: books; min-height: 340px; }
 
   .block .tag{
@@ -636,6 +639,16 @@
       rotates: "sequential",
       sequentialStart: "2026-09-14",
       map: r => ({ primary: r.law, tag: r.number ? ("Law " + r.number) : "", body: r.summary, example: r.application })
+    },
+    {
+      key: "gracian", sheetName: "Gracian", title: "The Art of Worldly Wisdom", style: "term",
+      // Baltasar Gracian's 300 maxims (tr. Joseph Jacobs, 1892 — public
+      // domain), one per day, walked through in book order and wrapping
+      // back to the top after maxim 300. sequentialStart is the date
+      // maxim 1 (day column value 1, the first row) should show.
+      rotates: "sequential",
+      sequentialStart: "2026-09-24",
+      map: r => ({ primary: r.title, tag: r.day ? ("Maxim " + r.day) : "", body: r.text, example: "" })
     },
     {
       key: "dailyenforcement", sheetName: "Daily Enforcement", title: "Morning Mantra", style: "term",
