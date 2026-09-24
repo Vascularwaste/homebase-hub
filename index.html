@@ -648,7 +648,7 @@
       // maxim 1 (day column value 1, the first row) should show.
       rotates: "sequential",
       sequentialStart: "2026-09-24",
-      map: r => ({ primary: r.title, tag: r.day ? ("Maxim " + r.day) : "", body: r.text, example: "" })
+      map: r => ({ primary: r.title, tag: r.day ? ("Maxim " + r.day) : "", body: r.text, example: r.context })
     },
     {
       key: "dailyenforcement", sheetName: "Daily Enforcement", title: "Morning Mantra", style: "term",
